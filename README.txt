@@ -1,7 +1,7 @@
 HNhance, a userscript for HN
 
-Script installation: https://megagrump.github.io/hnhance/
-Code: https://github.com/megagrump/hnhance
+Script installation: https://raw.githubusercontent.com/megagrump/hnhance/master/index.js
+Code repo: https://github.com/megagrump/hnhance
 
 I made this for personal use because I wanted dark mode and content filtering on Hacker News. I reckon others may find it useful as well.
 
