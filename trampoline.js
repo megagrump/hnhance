@@ -20,7 +20,7 @@
 
     GM.xmlHttpRequest({
         method: 'GET',
-        url: `http://127.0.0.1:8000/index.js?ts=${Date.now()}`,
+        url: `http://127.0.0.1:8000/hnhance.user.js?ts=${Date.now()}`,
         onload: response => {
             const remoteScript = document.createElement('script')
             remoteScript.textContent = response.responseText
