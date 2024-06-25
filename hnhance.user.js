@@ -209,7 +209,8 @@
     }
 
     const domainUI = () => {
-        const domain = document.querySelector('.sitestr').textContent
+        const domain = document.querySelector('.sitestr')?.textContent
+        if(domain === undefined) return undefined
         const menu = document.getElementById('hnemenu')
         createElement(menu, 'input', '', {
             type: 'checkbox',
