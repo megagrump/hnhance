@@ -167,7 +167,7 @@
                 undimComments()
             },
         })
-        const e = createElement(parent, 'label', 'No dim comments', { for: 'undimcheckbox' })
+        const e = createElement(parent, 'label', 'Do not dim comments', { for: 'undimcheckbox' })
         createElement(parent, 'br')
     }
 
