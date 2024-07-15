@@ -312,7 +312,6 @@
     }
 
     const undimComments = () => {
-        console.log(settings.undim)
         if(!settings.undim) {
             const s = document.getElementById('undimstyle')
             return s ? s.remove() : null
