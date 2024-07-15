@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HNhance
 // @namespace    elpocko
-// @version      1.0
+// @version      1.1
 // @description  Hacker News Enhancer
 // @icon         https://news.ycombinator.com/favicon.ico
 // @author       elpocko
@@ -20,6 +20,14 @@
         darkest: 'filter: invert(100%) hue-rotate(180deg);',
     }
 
+    const UNDIM = `
+        .c5a, .c73, .c82, .c88, .c9c, .cae, .cbe, .cce, .cdd, .ca2,
+        .c5a a:link, .c73 a:link, .c82 a:link, .c88 a:link, .c9c a:link, .cae a:link, .cbe a:link, .cce a:link, .cdd a:link,
+        .c5a a:visited, .c73 a:visited, .c82 a:visited, .c88 a:visited, .c9c a:visited, .cae a:visited, .cbe a:visited, .cce a:visited, .cdd a:visited {
+          color: #000 !important;
+        }
+    `
+
     const KIND_COMMENT = 1
     const KIND_SUBMISSION = 2
 
@@ -31,6 +39,9 @@
         constructor() {
             setStyle(this.style)
         }
+
+        get undim() { return GM_getValue('hne_undim', false) }
+        set undim(undim) { GM_setValue('hne_undim', undim) }
 
         get style() { return GM_getValue('hne_style', 'default') }
         set style(style) { GM_setValue('hne_style', style) }
@@ -135,6 +146,18 @@
                 toggleMenu()
             },
         })
+
+        createElement(parent, 'label', '<br>No dim comments', { for: 'undimcheckbox' })
+        createElement(parent, 'input', '', {
+            type: 'checkbox',
+            name: 'undimcheckbox',
+            checked: settings.undim ? 'checked' : null,
+            onchange: ev => {
+                settings.undim = ev.target.checked
+                undimComments()
+            },
+        })
+
         createElement(parent, 'br')
     }
 
@@ -288,6 +311,19 @@
         })
     }
 
+    const undimComments = () => {
+        console.log(settings.undim)
+        if(!settings.undim) {
+            const s = document.getElementById('undimstyle')
+            return s ? s.remove() : null
+        }
+
+        const style = document.createElement('style')
+        style.id = 'undimstyle'
+        style.textContent = UNDIM
+        document.body.appendChild(style)
+    }
+
     const newsContext = () => {
         blockUI(filterSubmissions)
         filterSubmissions()
@@ -345,6 +381,7 @@
             '/highlights':   commentContext,
         })[window.location.pathname] || (() => {})
 
+        undimComments()
         context()
     }
 
