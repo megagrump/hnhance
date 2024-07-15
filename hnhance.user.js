@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HNhance
 // @namespace    elpocko
-// @version      1.2
+// @version      1.3
 // @description  Hacker News Enhancer
 // @icon         https://news.ycombinator.com/favicon.ico
 // @author       elpocko
@@ -109,20 +109,15 @@
         #blockedDomains = GM_getValue('hne_blocked_domains', {})
     }()
 
-    const createElement = (parent, type, content = "", attrs = {}) => {
+    const createElement = (parent, type, content = "", attrs = {}, props = {}) => {
         const el = document.createElement(type)
         el.innerHTML = content
         if(parent) parent.appendChild(el)
         for(const attr in attrs) {
-            const val = attrs[attr]
-            switch(typeof val) {
-                case 'function':
-                case 'object':
-                case 'undefined':
-                    el[attr] = attrs[attr]; break
-                default:
-                    el.setAttribute(attr, attrs[attr]); break
-            }
+            el.setAttribute(attr, attrs[attr])
+        }
+        for(const prop in props) {
+            el[prop] = props[prop]
         }
         return el
     }
@@ -147,8 +142,9 @@
     const styleUI = parent => {
         createElement(parent, 'label', 'Page style: &nbsp;', { for: 'styleselector' })
         const options = Object.keys(STYLES).map(s => `<option value="${s}">${s}</option>`).join('\n')
-        createElement(parent, 'select', options, {
+        const styleSelector = createElement(parent, 'select', options, {
             id: 'styleselector',
+        }, {
             value: settings.style,
             onchange: ev => {
                 settings.style = ev.target.value
@@ -161,6 +157,7 @@
         createElement(parent, 'input', '', {
             type: 'checkbox',
             id: 'undimcheckbox',
+        }, {
             checked: settings.undim ? 'checked' : null,
             onchange: ev => {
                 settings.undim = ev.target.checked
@@ -176,6 +173,7 @@
         createElement(menu, 'input', '', {
             type: 'checkbox',
             id: 'blockunvotable',
+        }, {
             checked: settings.blockUnvotable ? 'checked' : null,
             onchange: ev => {
                 settings.blockUnvotable = ev.target.checked
@@ -192,6 +190,7 @@
         const browse = createElement(form, 'input', '', {
             type: 'file',
             style: 'display: none',
+        }, {
             onchange: ev => {
                 const reader = new FileReader()
                 reader.onload = ev => {
@@ -205,6 +204,7 @@
         createElement(form, 'input', '', {
             type: 'button',
             value: "Export settings",
+        }, {
             onclick: ev => {
                 settings.exportJSON()
                 toggleMenu()
@@ -216,6 +216,7 @@
             class: 'default',
             style: 'margin-left: 1em',
             value: "Import settings",
+        }, {
             onclick: ev => {
                 browse.click()
                 toggleMenu()
@@ -234,6 +235,7 @@
             createElement(menu, 'input', '', {
                 type: 'checkbox',
                 id,
+            }, {
                 checked: settings.isUserBlocked(userId, kind) ? 'checked' : null,
                 onchange: ev => { settings.blockUser(userId, kind, ev.target.checked) },
             })
@@ -248,6 +250,7 @@
         createElement(menu, 'input', '', {
             type: 'checkbox',
             id: 'blockdomain',
+        }, {
             checked: settings.isDomainBlocked(domain) ? 'checked' : null,
             onchange: ev => { settings.blockDomain(domain, ev.target.checked) },
         })
@@ -262,6 +265,7 @@
         const menuTD = topbar.firstChild.cloneNode()
         menuButton = createElement(menuTD, 'a', "&nbsp;☰", {
             href: 'javascript:void(null)',
+        }, {
             onclick: toggleMenu,
         })
 
