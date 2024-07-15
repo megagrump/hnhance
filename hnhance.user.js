@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HNhance
 // @namespace    elpocko
-// @version      1.1
+// @version      1.2
 // @description  Hacker News Enhancer
 // @icon         https://news.ycombinator.com/favicon.ico
 // @author       elpocko
@@ -113,7 +113,17 @@
         const el = document.createElement(type)
         el.innerHTML = content
         if(parent) parent.appendChild(el)
-        for(const attr in attrs) el[attr] = attrs[attr]
+        for(const attr in attrs) {
+            const val = attrs[attr]
+            switch(typeof val) {
+                case 'function':
+                case 'object':
+                case 'undefined':
+                    el[attr] = attrs[attr]; break
+                default:
+                    el.setAttribute(attr, attrs[attr]); break
+            }
+        }
         return el
     }
 
@@ -138,7 +148,7 @@
         createElement(parent, 'label', 'Page style: &nbsp;', { for: 'styleselector' })
         const options = Object.keys(STYLES).map(s => `<option value="${s}">${s}</option>`).join('\n')
         createElement(parent, 'select', options, {
-            name: 'styleselector',
+            id: 'styleselector',
             value: settings.style,
             onchange: ev => {
                 settings.style = ev.target.value
@@ -146,18 +156,18 @@
                 toggleMenu()
             },
         })
+        createElement(parent, 'br')
 
-        createElement(parent, 'label', '<br>No dim comments', { for: 'undimcheckbox' })
         createElement(parent, 'input', '', {
             type: 'checkbox',
-            name: 'undimcheckbox',
+            id: 'undimcheckbox',
             checked: settings.undim ? 'checked' : null,
             onchange: ev => {
                 settings.undim = ev.target.checked
                 undimComments()
             },
         })
-
+        const e = createElement(parent, 'label', 'No dim comments', { for: 'undimcheckbox' })
         createElement(parent, 'br')
     }
 
@@ -165,7 +175,7 @@
         const menu = document.getElementById('hnemenu');
         createElement(menu, 'input', '', {
             type: 'checkbox',
-            name: 'blockunvotable',
+            id: 'blockunvotable',
             checked: settings.blockUnvotable ? 'checked' : null,
             onchange: ev => {
                 settings.blockUnvotable = ev.target.checked
@@ -220,14 +230,14 @@
             [ 'hideposts', KIND_SUBMISSION, `Hide ${userId}'s submissions` ],
             [ 'hidecomments', KIND_COMMENT, `Hide ${userId}'s comments` ]
         ].forEach(input => {
-            const [ name, kind, text ] = input
+            const [ id, kind, text ] = input
             createElement(menu, 'input', '', {
                 type: 'checkbox',
-                name,
+                id,
                 checked: settings.isUserBlocked(userId, kind) ? 'checked' : null,
                 onchange: ev => { settings.blockUser(userId, kind, ev.target.checked) },
             })
-            createElement(menu, 'label', text + '<br>', { for: name })
+            createElement(menu, 'label', text + '<br>', { for: id })
         })
     }
 
@@ -237,7 +247,7 @@
         const menu = document.getElementById('hnemenu')
         createElement(menu, 'input', '', {
             type: 'checkbox',
-            name: 'blockdomain',
+            id: 'blockdomain',
             checked: settings.isDomainBlocked(domain) ? 'checked' : null,
             onchange: ev => { settings.blockDomain(domain, ev.target.checked) },
         })
